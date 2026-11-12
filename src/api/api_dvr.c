@@ -432,6 +432,7 @@ api_dvr_autorec_create
   dvr_config_t *cfg;
   dvr_autorec_entry_t *dae;
   const char *s1;
+  char ubuf[UUID_HEX_SIZE]; //hrvoje
 
   if (!(conf  = htsmsg_get_map(args, "conf")))
     return EINVAL;
@@ -448,6 +449,11 @@ api_dvr_autorec_create
   if (cfg) {
     htsmsg_set_uuid(conf, "config_name", &cfg->dvr_id.in_uuid);
     dae = dvr_autorec_create(NULL, conf);
+    //hrvoje
+    if (dae && !channel_access(dae->dae_channel, perm, 0)) {
+      autorec_destroy_by_id(idnode_uuid_as_str(&dae->dae_id, ubuf), 1);
+      dae = NULL;
+    }
     if (dae) {
       api_idnode_create(resp, &dae->dae_id);
       dvr_autorec_changed(dae, 0);
@@ -490,7 +496,8 @@ api_dvr_autorec_create_by_series
     tvh_mutex_lock(&global_lock);
     if ((e = epg_broadcast_find_by_id(strtoll(s, NULL, 10)))) {
       dvr_config_t *cfg = dvr_config_find_by_list(perm->aa_dvrcfgs, config_uuid);
-      if (cfg) {
+      //hrvoje
+      if (cfg && channel_access(e->channel, perm, 0)) {
         title = epg_broadcast_get_title(e, NULL);
         comment = alloca(strlen(title) + strlen(msg) + 1);
         sprintf(comment, "%s%s", title, msg);
@@ -534,6 +541,7 @@ api_dvr_timerec_create
 {
   htsmsg_t *conf;
   dvr_timerec_entry_t *dte;
+  char ubuf[UUID_HEX_SIZE]; //hrvoje
 
   if (!(conf  = htsmsg_get_map(args, "conf")))
     return EINVAL;
@@ -543,6 +551,11 @@ api_dvr_timerec_create
 
   tvh_mutex_lock(&global_lock);
   dte = dvr_timerec_create(NULL, conf);
+  //hrvoje
+  if (dte && !channel_access(dte->dte_channel, perm, 0)) {
+    timerec_destroy_by_id(idnode_uuid_as_str(&dte->dte_id, ubuf), 1);
+    dte = NULL;
+  }
   if (dte) {
     api_idnode_create(resp, &dte->dte_id);
     dvr_timerec_check(dte);
