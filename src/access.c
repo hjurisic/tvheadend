@@ -175,8 +175,12 @@ access_ticket_verify2(const char *id, const char *resource)
   access_ticket_t *at;
   char buf[256], *r;
 
-  if((at = access_ticket_find(id)) == NULL)
+  if((at = access_ticket_find(id)) == NULL){
+    //hrvoje
+    if (id) tvhinfo(LS_ACCESS, "can't find ticket %s for %s",
+      id, resource);
     return NULL;
+  }
 
   if (tvheadend_webroot) {
     snprintf(buf, sizeof(buf), "%s%s", tvheadend_webroot, at->at_resource);

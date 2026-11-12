@@ -470,10 +470,18 @@ dvr_vfs_rec_start_check(dvr_config_t *cfg)
 
   if (availBytes < requiredBytes || ((maximalBytes < usedBytes) && cfg->dvr_cleanup_threshold_used)) {
     /* Not enough space to start recording, check if cleanup helps */
+        /*tvherror(LS_NONE, "availBytes: %" PRId64 , availBytes);
+        tvherror(LS_NONE, "requiredBytes: %" PRId64 , requiredBytes);
+        tvherror(LS_NONE, "maximalBytes: %" PRId64 , maximalBytes);
+        tvherror(LS_NONE, "usedBytes: %" PRId64 , usedBytes);
+        tvherror(LS_NONE, "cfg->dvr_cleanup_threshold_used: %d", cfg->dvr_cleanup_threshold_used);*/
+
     cleanedBytes = dvr_disk_space_cleanup(cfg, 0);
     availBytes += cleanedBytes;
     usedBytes -= cleanedBytes;
-    if (availBytes < requiredBytes || ((maximalBytes < usedBytes) && cfg->dvr_cleanup_threshold_used))
+    //hrvoje
+    //if (availBytes < requiredBytes || ((maximalBytes < usedBytes) && cfg->dvr_cleanup_threshold_used))
+    if (availBytes*2 < requiredBytes || ((maximalBytes < usedBytes) && cfg->dvr_cleanup_threshold_used))
       return 0;
   }
   return availBytes;

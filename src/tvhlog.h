@@ -71,6 +71,7 @@ static inline int tvhlog_limit ( tvhlog_limit_t *limit, uint32_t delay )
     if (limit->last + sec2mono(delay) < t) { limit->last = t; return 1; }
     return 0; }
 
+void access_log ( const char *fmt, ... ); //hrvoje
 
 /* Options */
 #define TVHLOG_OPT_DBG_SYSLOG   0x0001
