@@ -608,6 +608,9 @@ dvr_autorec_entry_class_perm(idnode_t *self, access_t *a, htsmsg_t *msg_to_write
     return 0;
   if (dvr_autorec_entry_verify(dae, a, msg_to_write == NULL ? 1 : 0))
     return -1;
+  //hrvoje
+  if (!channel_access(dae->dae_channel, a, 0))
+    return -1;
   return 0;
 }
 

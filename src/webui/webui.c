@@ -952,8 +952,7 @@ http_dvr_list_playlist(http_connection_t *hc, int pltype, int urlauth)
     if(!fsize)
       continue;
 
-    if (de->de_channel &&
-        http_access_verify_channel(hc, ACCESS_RECORDER, de->de_channel))
+    if (http_access_verify_channel(hc, ACCESS_RECORDER, de->de_channel))
       continue;
 
     if (hc->hc_access == NULL)
@@ -2630,7 +2629,7 @@ page_dvrfile(http_connection_t *hc, const char *remain, void *opaque)
   //hrvoje
   //if(dvr_entry_verify(de, hc->hc_access, 1)) {
   if(dvr_entry_verify(de, hc->hc_access, 1) ||
-     (de->de_channel && http_access_verify_channel(hc, ACCESS_RECORDER, de->de_channel))) {
+     http_access_verify_channel(hc, ACCESS_RECORDER, de->de_channel)) {
     tvh_mutex_unlock(&global_lock);
     return http_noaccess_code(hc);
   }

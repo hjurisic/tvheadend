@@ -328,6 +328,19 @@ page_einfo(http_connection_t *hc, const char *remain, void *opaque)
 
   de = dvr_find_by_event(e);
 
+  //hrvoje
+  if((http_arg_get(&hc->hc_req_args, "rec")) != NULL &&
+     http_access_verify_channel(hc, ACCESS_RECORDER, e->channel)) {
+    tvh_mutex_unlock(&global_lock);
+    return 403;
+  }
+  if(de != NULL && (http_arg_get(&hc->hc_req_args, "cancel")) != NULL &&
+     (dvr_entry_verify(de, hc->hc_access, 0) ||
+      http_access_verify_channel(hc, ACCESS_RECORDER, de->de_channel))) {
+    tvh_mutex_unlock(&global_lock);
+    return 403;
+  }
+
   if((http_arg_get(&hc->hc_req_args, "rec")) != NULL) {
     conf = htsmsg_create_map();
     htsmsg_add_str2(conf, "owner", hc->hc_username);
@@ -429,6 +442,12 @@ page_pvrinfo(http_connection_t *hc, const char *remain, void *opaque)
   if(remain == NULL || (de = dvr_entry_find_by_id(atoi(remain))) == NULL) {
     tvh_mutex_unlock(&global_lock);
     return 404;
+  }
+  //hrvoje
+  if(dvr_entry_verify(de, hc->hc_access, 0) ||
+     http_access_verify_channel(hc, ACCESS_RECORDER, de->de_channel)) {
+    tvh_mutex_unlock(&global_lock);
+    return 403;
   }
   if((http_arg_get(&hc->hc_req_args, "clear")) != NULL) {
     de = dvr_entry_cancel(de, 0);
