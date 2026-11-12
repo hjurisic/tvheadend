@@ -2161,7 +2161,9 @@ htsp_findDvrEntry(htsp_connection_t *htsp, htsmsg_t *in, htsmsg_t **out, int rea
     return NULL;
   }
 
-  if(dvr_entry_verify(de, htsp->htsp_granted_access, readonly)) {
+  //hrvoje
+  //if(dvr_entry_verify(de, htsp->htsp_granted_access, readonly)) {
+  if(dvr_entry_verify(de, htsp->htsp_granted_access, readonly) || !htsp_user_access_channel(htsp, de->de_channel)) {
     *out = htsp_error(htsp, N_("User does not have access"));
     return NULL;
   }
@@ -2371,7 +2373,9 @@ htsp_method_updateAutorecEntry(htsp_connection_t *htsp, htsmsg_t *in)
   if((dae = dvr_autorec_find_by_uuid(daeId)) == NULL)
     return htsp_error(htsp, N_("Automatic schedule entry not found"));
 
-  if(dvr_autorec_entry_verify(dae, htsp->htsp_granted_access, 0))
+  //hrvoje
+  //if(dvr_autorec_entry_verify(dae, htsp->htsp_granted_access, 0))
+  if(dvr_autorec_entry_verify(dae, htsp->htsp_granted_access, 0) || !htsp_user_access_channel(htsp, dae->dae_channel))
     return htsp_error(htsp, N_("User does not have access"));
 
   /* Do we have a channel? No = keep old one */
@@ -2407,7 +2411,9 @@ htsp_method_deleteAutorecEntry(htsp_connection_t *htsp, htsmsg_t *in)
   if((dae = dvr_autorec_find_by_uuid(daeId)) == NULL)
     return htsp_error(htsp, N_("Automatic schedule entry not found"));
 
-  if(dvr_autorec_entry_verify(dae, htsp->htsp_granted_access, 0))
+  //hrvoje
+  //if(dvr_autorec_entry_verify(dae, htsp->htsp_granted_access, 0))
+  if(dvr_autorec_entry_verify(dae, htsp->htsp_granted_access, 0) || !htsp_user_access_channel(htsp, dae->dae_channel))
     return htsp_error(htsp, N_("User does not have access"));
 
   autorec_destroy_by_id(daeId, 1);
@@ -2482,7 +2488,9 @@ htsp_method_updateTimerecEntry(htsp_connection_t *htsp, htsmsg_t *in)
   if((dte = dvr_timerec_find_by_uuid(dteId)) == NULL)
     return htsp_error(htsp, N_("Automatic time scheduler entry not found"));
 
-  if(dvr_timerec_entry_verify(dte, htsp->htsp_granted_access, 0))
+  //hrvoje
+  //if(dvr_timerec_entry_verify(dte, htsp->htsp_granted_access, 0))
+  if(dvr_timerec_entry_verify(dte, htsp->htsp_granted_access, 0) || !htsp_user_access_channel(htsp, dte->dte_channel))
     return htsp_error(htsp, N_("User does not have access"));
 
   /* Do we have a channel? No = keep old one */
@@ -2517,7 +2525,9 @@ htsp_method_deleteTimerecEntry(htsp_connection_t *htsp, htsmsg_t *in)
   if((dte = dvr_timerec_find_by_uuid(dteId)) == NULL)
     return htsp_error(htsp, N_("Automatic time scheduler entry not found"));
 
-  if(dvr_timerec_entry_verify(dte, htsp->htsp_granted_access, 0))
+  //hrvoje
+  //if(dvr_timerec_entry_verify(dte, htsp->htsp_granted_access, 0))
+  if(dvr_timerec_entry_verify(dte, htsp->htsp_granted_access, 0) || !htsp_user_access_channel(htsp, dte->dte_channel))
     return htsp_error(htsp, N_("User does not have access"));
 
   timerec_destroy_by_id(dteId, 1);
@@ -2553,7 +2563,9 @@ htsp_method_getDvrCutpoints(htsp_connection_t *htsp, htsmsg_t *in)
   if((de = dvr_entry_find_by_id(dvrEntryId)) == NULL)
     return htsp_error(htsp, N_("DVR schedule not found"));
 
-  if(dvr_entry_verify(de, htsp->htsp_granted_access, 1))
+  //hrvoje
+  //if(dvr_entry_verify(de, htsp->htsp_granted_access, 1))
+  if(dvr_entry_verify(de, htsp->htsp_granted_access, 1) || !htsp_user_access_channel(htsp, de->de_channel))
     return htsp_error(htsp, N_("User does not have access"));
 
   htsmsg_t *msg = htsmsg_create_map();
