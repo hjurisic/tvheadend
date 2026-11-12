@@ -925,3 +925,40 @@ const idclass_t tvhlog_conf_class = {
     {}
   }
 };
+
+//hrvoje
+static void _access_log(const char *fmt, va_list *args){
+  size_t l;
+  char buf[1024], t[128];
+  struct timeval tv;
+  struct tm tm;
+
+  if(gettimeofday(&tv, NULL) == -1)
+    return;
+
+  localtime_r(&tv.tv_sec, &tm);
+  strftime(t, sizeof(t), "%F %T", &tm);// %d %H:%M:%S", &tm);
+
+  l = 0;
+  if (args)
+    vsnprintf(buf + l, sizeof(buf) - l, fmt, *args);
+  else
+    snprintf(buf + l, sizeof(buf) - l, "%s", fmt);
+
+  FILE *pFile;
+  pFile=fopen("/root/tvhaccess.txt", "a");
+  if(pFile==NULL) {
+    return;
+  }
+  fprintf(pFile, "%s: %s\n", t, buf);
+  fclose(pFile);
+}
+
+//hrvoje
+void access_log ( const char *fmt, ... )
+{
+  va_list args;
+  va_start(args, fmt);
+  _access_log(fmt, &args);
+  va_end(args);
+}
