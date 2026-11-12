@@ -1008,7 +1008,9 @@ http_dvr_playlist(http_connection_t *hc, int pltype, int urlauth, dvr_entry_t *d
   if(http_access_verify(hc, ACCESS_RECORDER))
     return http_noaccess_code(hc);
 
-  if(dvr_entry_verify(de, hc->hc_access, 1))
+  //hrvoje
+  if(dvr_entry_verify(de, hc->hc_access, 1) ||
+     http_access_verify_channel(hc, ACCESS_RECORDER, de->de_channel))
     return HTTP_STATUS_NOT_FOUND;
 
   http_get_hostpath(hc, hostpath, sizeof(hostpath));

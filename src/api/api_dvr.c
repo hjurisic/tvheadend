@@ -171,8 +171,13 @@ api_dvr_entry_create
       htsmsg_add_str(m, lang, s1);
       htsmsg_add_msg(conf, "subtitle", m);
     }
-    if ((de = dvr_entry_create(NULL, conf, 0)))
-      api_idnode_create(resp, &de->de_id);
+    if ((de = dvr_entry_create(NULL, conf, 0))) {
+      //hrvoje
+      if (!channel_access(de->de_channel, perm, 0))
+        dvr_entry_cancel_delete(de, 0);
+      else
+        api_idnode_create(resp, &de->de_id);
+    }
 
     res = 0;
     free(lang);
@@ -237,7 +242,7 @@ api_dvr_entry_create_by_event
     tvh_mutex_lock(&global_lock);
     if ((e = epg_broadcast_find_by_id(strtoll(s, NULL, 10)))) {
       dvr_config_t *cfg = dvr_config_find_by_list(perm->aa_dvrcfgs, config_uuid);
-      if (cfg) {
+      if (cfg && channel_access(e->channel, perm, 0)) {
         htsmsg_add_uuid(conf, "config_name", &cfg->dvr_id.in_uuid);
         de = dvr_entry_create_from_htsmsg(conf, e);
         if (de)
